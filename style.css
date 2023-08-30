@@ -1,0 +1,53 @@
+/* assets/styles.css */
+.centered-dropdowns {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.no-border {
+    border: none !important;
+}
+
+.az-dashboard-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    /* border-bottom: 1px solid $gray-300; */
+    margin-bottom: 20px;
+  
+    .nav-link {
+      font-size: 12px;
+      padding: 5px 10px 8px;
+      display: flex;
+      align-items: center;
+      line-height: 1;
+  
+      /* @include media-breakpoint-up(sm) { font-size: $font-size-base; }
+      @include media-breakpoint-up(lg) { padding: 5px 15px 10px; }
+  
+      @include hover-focus() { color: $az-color-primary; }
+   */
+      /* + .nav-link { border-left: 1px solid $gray-300; } */
+    }
+  
+    /* .nav:first-child { */
+      /* .nav-link {
+        color: $gray-900;
+        display: none; */
+  
+        /* @include media-breakpoint-up(sm) { display: block; }
+  
+        @include hover-focus() { color: $az-color-primary; }
+   */
+        /* &.active { color: $az-color-primary; } */
+  
+        /* &:first-child { padding-left: 0; } */
+  
+        /* &:first-child, */
+        /* &:last-child { */
+          /* display: block; */
+        /* } */
+      /* } */
+    }

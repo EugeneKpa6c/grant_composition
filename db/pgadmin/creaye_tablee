@@ -1,0 +1,2 @@
+CREATE TABLE images ( id_img SERIAL PRIMARY KEY, date TIMESTAMP NOT NULL, link_img TEXT ); 
+CREATE TABLE stones ( id_stone SERIAL PRIMARY KEY,id_name TEXT, id_img INTEGER REFERENCES images(id_img), boxes_xywh DOUBLE PRECISION[4], boxes_conf DOUBLE PRECISION);

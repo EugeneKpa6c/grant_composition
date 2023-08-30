@@ -1,0 +1,63 @@
+# version: '3.5'
+
+# services:
+#   dash:
+#     container_name: dash_container
+#     image: dash
+    # ports:
+    #   - "8050:8050"
+#     networks:
+#       - postgres
+#     restart: unless-stopped
+
+# networks:
+#   frontend:
+#     driver: bridge
+#     ipam:
+#       config:
+#         - subnet: 10.10.136.0/24
+#   postgres:
+#     external:
+#       name: database_postgres
+
+version: '3.5'
+
+services:
+  dash:
+    container_name: dash_container
+    image: dash
+    ports:
+      - "8050:8050"
+    volumes:
+      - assets_volume:/app/assets/
+    networks:
+      - postgres
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx_container
+    volumes:
+      # - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - assets_volume:/assets/
+    ports:
+      - "8800:8800"
+    networks:
+      - postgres
+    depends_on:
+      - dash
+    restart: unless-stopped
+
+volumes:
+  assets_volume:
+
+networks:
+  frontend:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.10.136.0/24
+  postgres:
+    external:
+      name: database_postgres
+

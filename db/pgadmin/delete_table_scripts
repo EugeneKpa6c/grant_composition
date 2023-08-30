@@ -1,0 +1,6 @@
+
+-- Очистка таблицы stones
+DELETE FROM stones;
+-- Очистка таблицы images
+DELETE FROM images;
+

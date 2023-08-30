@@ -1,0 +1,83 @@
+CREATE OR REPLACE FUNCTION insert_data(
+    array_boxes_xywh FLOAT8[],
+    array_boxes_conf DOUBLE PRECISION[],
+    link_img_str TEXT,
+	name_formatted_date TEXT
+) RETURNS VOID AS $$
+DECLARE
+    last_id_img INTEGER;
+    box_len INTEGER := array_length(array_boxes_conf, 1);
+    i INTEGER;
+    xywh_box FLOAT8[4];
+    last_date TIMESTAMP;
+    last_id_name TEXT;
+	last_xywh_box FLOAT8[4];
+	penultimate_xywh_box FLOAT8[4];
+	next_counter INT;
+	penultimate_id_name TEXT;
+	value_id_name TEXT;
+BEGIN
+    -- Получаем дату последней записи, если она есть
+    IF (SELECT COUNT(*) FROM images) = 0 THEN
+		 last_date :=  NULL;
+	ELSE
+		SELECT date INTO last_date FROM images ORDER BY id_img DESC LIMIT 1;
+	END IF;
+
+    -- Получаем id_name последней записи, если она есть
+	IF (SELECT COUNT(*) FROM images) = 0 THEN
+		last_id_name := NULL;
+	ELSE
+		SELECT id_name INTO last_id_name FROM stones ORDER BY id_stone DESC LIMIT 1;
+		-- Получаем xywh_box последней записи, если она есть
+    	SELECT boxes_xywh INTO last_xywh_box FROM stones ORDER BY id_stone DESC LIMIT 1;
+	END IF;
+	
+	-- Получаем id_name предпоследней записи, если она есть
+	IF (SELECT COUNT(*) FROM images) < 1 THEN
+		penultimate_id_name := NULL;
+	ELSE
+		SELECT id_name INTO penultimate_id_name FROM stones ORDER BY id_stone DESC LIMIT 2;
+		-- Получаем xywh_box предпоследней записи, если она есть
+		SELECT boxes_xywh INTO penultimate_xywh_box FROM stones ORDER BY id_stone DESC LIMIT 2;
+	END IF;
+	
+    -- Добавляем новое изображение и получаем его id
+	
+    INSERT INTO images (date, link_img) VALUES (NOW(), link_img_str) RETURNING id_img INTO last_id_img;
+
+    FOR i IN 1..box_len LOOP
+        xywh_box := ARRAY[array_boxes_xywh[(i-1)*4+1], array_boxes_xywh[(i-1)*4+2], array_boxes_xywh[(i-1)*4+3], array_boxes_xywh[(i-1)*4+4]];
+        -- Определяем id_name в соответствии с условиями
+--         IF last_date IS NULL OR EXTRACT(MINUTE FROM NOW() - last_date) > 1 THEN
+-- 			RAISE NOTICE '1';
+-- 			value_id_name := CONCAT(name_formatted_date, '-', i); 
+        IF last_date IS NULL OR EXTRACT(SECOND FROM NOW() - last_date) > 1 THEN
+			RAISE NOTICE '1';
+			value_id_name := CONCAT(name_formatted_date, '-', i);
+        ELSIF last_id_name IS NOT NULL AND 
+              (array_boxes_xywh[(i-1)*4+1] - last_xywh_box[1] < 15 AND
+			   array_boxes_xywh[(i-1)*4+1] - last_xywh_box[1] > -15 AND
+               array_boxes_xywh[(i-1)*4+2] - last_xywh_box[2] < 15 AND
+			   array_boxes_xywh[(i-1)*4+2] - last_xywh_box[2] > -15)
+			   THEN	   
+			   RAISE NOTICE '2';
+			   value_id_name := last_id_name; 
+		ELSIF penultimate_id_name IS NOT NULL AND 
+              (array_boxes_xywh[(i-1)*4+1] - penultimate_xywh_box[1] < 15 AND
+			   array_boxes_xywh[(i-1)*4+1] - penultimate_xywh_box[1] > -15 AND
+               array_boxes_xywh[(i-1)*4+2] - penultimate_xywh_box[2] < 15 AND
+			   array_boxes_xywh[(i-1)*4+2] - penultimate_xywh_box[2] > -15)
+			   THEN	
+			 	RAISE NOTICE '3';
+		  		value_id_name := penultimate_id_name;
+		ELSE 
+			RAISE NOTICE '4';
+			   value_id_name := CONCAT(name_formatted_date, '-', i) ;
+        END IF;
+        -- Вставляем данные в таблицу stones
+        INSERT INTO stones (id_name, id_img, boxes_xywh, boxes_conf)
+        VALUES (value_id_name, last_id_img, xywh_box, array_boxes_conf[i]);
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;

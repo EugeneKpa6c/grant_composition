@@ -1,0 +1,103 @@
+:root {
+  --inactive: #acd4ae;
+  --active: #2b662e;
+}
+
+body {
+  font-family: sans-serif;
+}
+
+#time_wrapper {
+  width: fit-content;
+  margin: 0 auto;
+  /*   background: pink; */
+  position: relative;
+  top: 150px;
+  transform: scale(1.5);
+}
+
+#time_input {
+  border: 2px solid var(--inactive);
+  width: fit-content;
+  color: #86c288;
+  display: flex;
+  align-items: center;
+}
+
+input {
+  width: 60px;
+  height: 60px;
+  border: none;
+  box-sizing: border-box;
+  padding: auto 15px;
+  text-align: center;
+  color: #132c14;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+}
+
+.label {
+  font-size: 0.55rem;
+  position: absolute;
+  top: 4.5px;
+}
+
+.label.lbl-hrs {
+  left: 20px;
+}
+
+.label.lbl-min {
+  left: 14px;
+}
+
+.label.lbl-sec {
+  left: 13px;
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+#time_input,
+input {
+  border-radius: 8px;
+  font-size: 1.5rem;
+}
+
+input:focus {
+  outline: 3px solid var(--active);
+}
+
+input:focus + .label {
+  color: var(--active);
+}
+
+input.invalid:focus {
+  outline: 3px solid red;
+}
+
+input.invalid:focus + .label {
+  color: red;
+}
+
+#error {
+  width: 280px;
+  position: relative;
+  top: 170px;
+  margin: 0 auto;
+  color: red;
+  visibility: hidden;
+}

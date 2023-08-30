@@ -1,0 +1,28 @@
+FROM python:3.8-slim-buster
+
+WORKDIR /app
+
+COPY assets ./assets
+COPY bootstrap ./bootstrap 
+COPY boxannotator.py .
+COPY app.py .
+COPY test_vcl.py .
+
+
+COPY pip.conf pip.conf
+ENV PIP_CONFIG_FILE pip.conf
+
+# Copy the requirements.txt
+COPY requirements.txt .
+
+# Upgrade pip and Run the pip - install
+RUN apt-get update && apt-get install -y libgl1-mesa-glx libglib2.0-0 libsm6 libxext6 libpq-dev gcc iputils-ping
+RUN apt-get install -y software-properties-common
+RUN apt-get update && apt-get install -y ffmpeg
+RUN pip3 install --upgrade pip
+RUN pip3 install -r requirements.txt
+
+
+#EXPOSE 5000
+
+CMD ["python", "app.py"]

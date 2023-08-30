@@ -1,0 +1,29 @@
+# Используйте образ, который содержит как Go, так и Node.js
+FROM golang:1.17-buster
+
+# Устанавливаем Node.js
+RUN apt-get update && apt-get install -y curl && \
+    curl -sL https://deb.nodesource.com/setup_16.x | bash - && \
+    apt-get install -y nodejs
+
+# Установите рабочую директорию внутри контейнера
+WORKDIR /app
+
+
+# Копируем файлы с зависимостями и устанавливаем их
+#COPY go.mod go.sum package.json package-lock.json ./
+COPY stream/go.mod stream/go.sum ./stream/
+COPY package.json package-lock.json ./
+
+WORKDIR /app/stream
+RUN go mod download
+
+WORKDIR /app
+RUN npm ci
+
+
+# Копируем оставшийся исходный код в контейнер
+COPY . .
+
+# Собираем приложение
+CMD ["npm", "start"]
